@@ -1,3 +1,4 @@
 Metadata-Version: 2.4
 Name: robust_rl_locomotion
 Version: 0.0.0
+Requires-Python: >=3.10
