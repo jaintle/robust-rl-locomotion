@@ -57,6 +57,30 @@
         "If eval_shifted.jsonl episodes == eval_clean.json episodes, their hashes must also match.",
         "shift_type must be 'gaussian' for Phase 5 runs."
       ]
+    },
+
+    "eval_shifted_dynamics.jsonl": {
+      "description": "Newline-delimited JSON (JSONL). One entry per alpha severity. Produced by scripts/eval_shifted_dynamics.py.",
+      "per_line_required_keys": {
+        "env_id":               "str",
+        "seed":                 "int",
+        "episodes":             "int",
+        "eval_seed_list_hash":  "str",
+        "shift_type":           "str",
+        "severity":             "number",
+        "return_mean":          "number",
+        "return_std":           "number",
+        "episode_len_mean":     "number",
+        "episode_len_std":      "number",
+        "mass_seed":            "int",
+        "mass_scale_mean":      "number",
+        "mass_scale_std":       "number"
+      },
+      "invariants": [
+        "All lines must share the same eval_seed_list_hash (one seed list per eval_shifted_dynamics.py run).",
+        "If eval_shifted_dynamics.jsonl episodes == eval_clean.json episodes, their hashes must also match.",
+        "shift_type must be 'mass_scale' for Phase 6 runs."
+      ]
     }
   },
 

@@ -9,6 +9,7 @@ Exits 1 and prints a clear error message on the first failure.
 
 Phase 4: validates required files + JSON key/type checks.
 Phase 5: also validates eval_shifted.jsonl if present (optional file).
+Phase 6: also validates eval_shifted_dynamics.jsonl if present (optional file).
 
 No external dependencies — stdlib only.
 """
@@ -142,14 +143,21 @@ def validate(run_dir: str, schema: dict) -> None:
         f"({len(clean_hash)} chars)"
     )
 
-    # 4. Optional: eval_shifted.jsonl -----------------------------------------
+    # 4. Optional: eval_shifted.jsonl (Phase 5 — Gaussian noise) -------------
     shifted_path = os.path.join(run_dir, "eval_shifted.jsonl")
     if not os.path.isfile(shifted_path):
         print("  [--] eval_shifted.jsonl not present (optional — skipping)")
     else:
         _validate_shifted_jsonl(shifted_path, schema, clean_hash, clean_episodes)
 
-    # 5. All checks passed ----------------------------------------------------
+    # 5. Optional: eval_shifted_dynamics.jsonl (Phase 6 — mass scale) ---------
+    dynamics_path = os.path.join(run_dir, "eval_shifted_dynamics.jsonl")
+    if not os.path.isfile(dynamics_path):
+        print("  [--] eval_shifted_dynamics.jsonl not present (optional — skipping)")
+    else:
+        _validate_shifted_dynamics_jsonl(dynamics_path, schema, clean_hash, clean_episodes)
+
+    # 6. All checks passed ----------------------------------------------------
     print("\nVALIDATION PASSED")
 
 
@@ -251,6 +259,114 @@ def _validate_shifted_jsonl(
             )
 
     print(f"  [ok] eval_shifted.jsonl: {len(non_empty)} entries validated")
+
+
+def _validate_shifted_dynamics_jsonl(
+    dynamics_path: str,
+    schema: dict,
+    clean_hash: str,
+    clean_episodes: int | None,
+) -> None:
+    """Validate eval_shifted_dynamics.jsonl line by line.
+
+    Key invariants enforced:
+    1. All lines must carry the SAME eval_seed_list_hash (the shifted-eval
+       script precomputes one seed list and reuses it across all severities).
+    2. If the episode count in eval_shifted_dynamics.jsonl matches eval_clean.json,
+       the hash must also match eval_clean.json (same episodes ↔ same seeds).
+       When episode counts differ this check is skipped and a note is printed.
+    3. shift_type must be 'mass_scale' for every line.
+    """
+
+    jsonl_schema  = schema.get("optional_files", {}).get("eval_shifted_dynamics.jsonl", {})
+    line_key_spec = jsonl_schema.get("per_line_required_keys", {})
+
+    with open(dynamics_path) as f:
+        raw_lines = f.readlines()
+
+    non_empty = [line.strip() for line in raw_lines if line.strip()]
+    if len(non_empty) == 0:
+        _fail("eval_shifted_dynamics.jsonl: file exists but contains no non-empty lines")
+
+    seen_hashes:   set[str] = set()
+    seen_episodes: set[int] = set()
+
+    for i, line in enumerate(non_empty, start=1):
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError as exc:
+            _fail(f"eval_shifted_dynamics.jsonl line {i}: not valid JSON — {exc}")
+
+        source = f"eval_shifted_dynamics.jsonl line {i}"
+
+        # Required keys and types.
+        _check_keys(source, entry, line_key_spec)
+
+        # shift_type must be 'mass_scale'.
+        shift_type = entry.get("shift_type")
+        if shift_type != "mass_scale":
+            _fail(
+                f"{source}: shift_type must be 'mass_scale' for Phase 6 runs "
+                f"(got {shift_type!r})"
+            )
+
+        # severity must be a number.
+        severity = entry.get("severity")
+        if not _is_number(severity):
+            _fail(
+                f"{source}: severity must be a number "
+                f"(got {type(severity).__name__!r}: {severity!r})"
+            )
+
+        line_hash = entry.get("eval_seed_list_hash", "")
+        seen_hashes.add(line_hash)
+
+        line_eps = entry.get("episodes")
+        if _is_int(line_eps):
+            seen_episodes.add(line_eps)
+
+        print(
+            f"  [ok] eval_shifted_dynamics.jsonl line {i}: "
+            f"shift_type={shift_type!r}  severity={severity}  "
+            f"mass_scale_mean={entry.get('mass_scale_mean')}"
+        )
+
+    # Invariant 1: all lines must share the same seed-list hash.
+    if len(seen_hashes) > 1:
+        _fail(
+            f"eval_shifted_dynamics.jsonl: inconsistent eval_seed_list_hash across "
+            f"lines — found {len(seen_hashes)} distinct values: {seen_hashes}. "
+            "All severities must use the same episode seed list."
+        )
+    shifted_hash = next(iter(seen_hashes))
+    print(
+        f"  [ok] eval_shifted_dynamics.jsonl: all {len(non_empty)} lines "
+        f"share hash {shifted_hash[:16]}…"
+    )
+
+    # Invariant 2: conditional hash cross-check against eval_clean.json.
+    if len(seen_episodes) == 1:
+        shifted_eps = next(iter(seen_episodes))
+        if clean_episodes is not None and shifted_eps == clean_episodes:
+            if shifted_hash != clean_hash:
+                _fail(
+                    f"eval_shifted_dynamics.jsonl: eval_seed_list_hash {shifted_hash!r} "
+                    f"does not match eval_clean.json hash {clean_hash!r}, "
+                    f"but both use episodes={shifted_eps}. "
+                    "Identical episode counts must produce identical seed lists."
+                )
+            print(
+                f"  [ok] eval_shifted_dynamics.jsonl: hash matches eval_clean.json "
+                f"(episodes={shifted_eps})"
+            )
+        else:
+            print(
+                f"  [--] eval_shifted_dynamics.jsonl uses episodes={shifted_eps}, "
+                f"eval_clean.json uses episodes={clean_episodes} — "
+                "hash cross-check skipped (different episode counts)."
+            )
+
+    print(f"  [ok] eval_shifted_dynamics.jsonl: {len(non_empty)} entries validated")
 
 
 # ---------------------------------------------------------------------------
