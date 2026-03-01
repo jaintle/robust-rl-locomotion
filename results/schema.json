@@ -1,0 +1,45 @@
+{
+  "description": "Required artifacts and key schema for every robust-rl-locomotion training run. Validated by tools/validate_results.py.",
+
+  "required_files": [
+    "config.json",
+    "train_summary.json",
+    "eval_clean.json",
+    "metrics.csv",
+    "checkpoint.pt"
+  ],
+
+  "required_keys": {
+    "config.json": {
+      "env_id":           "str",
+      "seed":             "int",
+      "total_timesteps":  "int",
+      "save_dir":         "str"
+    },
+
+    "train_summary.json": {
+      "env_id":                    "str",
+      "seed":                      "int",
+      "total_timesteps":           "int",
+      "train_return_mean_last_100": "number",
+      "train_return_std_last_100":  "number"
+    },
+
+    "eval_clean.json": {
+      "env_id":               "str",
+      "seed":                 "int",
+      "episodes":             "int",
+      "eval_seed_list_hash":  "str",
+      "return_mean":          "number",
+      "return_std":           "number",
+      "episode_len_mean":     "number",
+      "episode_len_std":      "number"
+    }
+  },
+
+  "type_legend": {
+    "str":    "Python str — must be a non-null string",
+    "int":    "Python int — must be a non-null integer (booleans excluded)",
+    "number": "Python int or float — must be a non-null numeric value"
+  }
+}
