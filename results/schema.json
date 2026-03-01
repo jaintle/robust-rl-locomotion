@@ -37,9 +37,32 @@
     }
   },
 
+  "optional_files": {
+    "eval_shifted.jsonl": {
+      "description": "Newline-delimited JSON (JSONL). One entry per evaluated severity. Produced by scripts/eval_shifted_noise.py.",
+      "per_line_required_keys": {
+        "env_id":               "str",
+        "seed":                 "int",
+        "episodes":             "int",
+        "eval_seed_list_hash":  "str",
+        "shift_type":           "str",
+        "severity":             "number",
+        "return_mean":          "number",
+        "return_std":           "number",
+        "episode_len_mean":     "number",
+        "episode_len_std":      "number"
+      },
+      "invariants": [
+        "All lines must share the same eval_seed_list_hash (one seed list per eval_shifted_noise.py run).",
+        "If eval_shifted.jsonl episodes == eval_clean.json episodes, their hashes must also match.",
+        "shift_type must be 'gaussian' for Phase 5 runs."
+      ]
+    }
+  },
+
   "type_legend": {
-    "str":    "Python str — must be a non-null string",
-    "int":    "Python int — must be a non-null integer (booleans excluded)",
-    "number": "Python int or float — must be a non-null numeric value"
+    "str":    "Python str -- must be a non-null string",
+    "int":    "Python int -- must be a non-null integer (booleans excluded)",
+    "number": "Python int or float -- must be a non-null numeric value"
   }
 }
