@@ -1,0 +1,92 @@
+{
+  "description": "Required artifacts and key schema for every robust-rl-locomotion training run. Validated by tools/validate_results.py.",
+
+  "required_files": [
+    "config.json",
+    "train_summary.json",
+    "eval_clean.json",
+    "metrics.csv",
+    "checkpoint.pt"
+  ],
+
+  "required_keys": {
+    "config.json": {
+      "env_id":           "str",
+      "seed":             "int",
+      "total_timesteps":  "int",
+      "save_dir":         "str"
+    },
+
+    "train_summary.json": {
+      "env_id":                    "str",
+      "seed":                      "int",
+      "total_timesteps":           "int",
+      "train_return_mean_last_100": "number",
+      "train_return_std_last_100":  "number"
+    },
+
+    "eval_clean.json": {
+      "env_id":               "str",
+      "seed":                 "int",
+      "episodes":             "int",
+      "eval_seed_list_hash":  "str",
+      "return_mean":          "number",
+      "return_std":           "number",
+      "episode_len_mean":     "number",
+      "episode_len_std":      "number"
+    }
+  },
+
+  "optional_files": {
+    "eval_shifted.jsonl": {
+      "description": "Newline-delimited JSON (JSONL). One entry per evaluated severity. Produced by scripts/eval_shifted_noise.py.",
+      "per_line_required_keys": {
+        "env_id":               "str",
+        "seed":                 "int",
+        "episodes":             "int",
+        "eval_seed_list_hash":  "str",
+        "shift_type":           "str",
+        "severity":             "number",
+        "return_mean":          "number",
+        "return_std":           "number",
+        "episode_len_mean":     "number",
+        "episode_len_std":      "number"
+      },
+      "invariants": [
+        "All lines must share the same eval_seed_list_hash (one seed list per eval_shifted_noise.py run).",
+        "If eval_shifted.jsonl episodes == eval_clean.json episodes, their hashes must also match.",
+        "shift_type must be 'gaussian' for Phase 5 runs."
+      ]
+    },
+
+    "eval_shifted_dynamics.jsonl": {
+      "description": "Newline-delimited JSON (JSONL). One entry per alpha severity. Produced by scripts/eval_shifted_dynamics.py.",
+      "per_line_required_keys": {
+        "env_id":               "str",
+        "seed":                 "int",
+        "episodes":             "int",
+        "eval_seed_list_hash":  "str",
+        "shift_type":           "str",
+        "severity":             "number",
+        "return_mean":          "number",
+        "return_std":           "number",
+        "episode_len_mean":     "number",
+        "episode_len_std":      "number",
+        "mass_seed":            "int",
+        "mass_scale_mean":      "number",
+        "mass_scale_std":       "number"
+      },
+      "invariants": [
+        "All lines must share the same eval_seed_list_hash (one seed list per eval_shifted_dynamics.py run).",
+        "If eval_shifted_dynamics.jsonl episodes == eval_clean.json episodes, their hashes must also match.",
+        "shift_type must be 'mass_scale' for Phase 6 runs."
+      ]
+    }
+  },
+
+  "type_legend": {
+    "str":    "Python str -- must be a non-null string",
+    "int":    "Python int -- must be a non-null integer (booleans excluded)",
+    "number": "Python int or float -- must be a non-null numeric value"
+  }
+}
