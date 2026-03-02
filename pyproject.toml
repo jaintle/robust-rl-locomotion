@@ -1,11 +1,29 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "robust_rl_locomotion"
-version = "0.0.0"
+name = "robust-rl-locomotion"
+version = "1.0.0"
+description = "Study of PPO robustness under deployment-time observation and dynamics shift in continuous control"
+readme = "README.md"
 requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0.0",
+    "gymnasium>=1.0.0",
+    "mujoco>=3.0.0",
+    "numpy>=2.0.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.0.0",
+    "PyYAML>=6.0",
+    "cloudpickle>=3.0.0",
+]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.setuptools]
+packages = ["src", "src.algo", "src.envs", "src.envs.wrappers", "src.eval", "src.utils"]
