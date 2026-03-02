@@ -1,7 +1,7 @@
 # robust-rl-locomotion: Evaluation-Time Robustness of PPO under Observation and Dynamics Shift
 
 [![CI](https://github.com/jaintle/robust-rl-locomotion/actions/workflows/ci.yml/badge.svg)](https://github.com/imabhi80/robust-rl-locomotion/actions/workflows/ci.yml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PLACEHOLDER.svg)](https://doi.org/10.5281/zenodo.18837162)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18837162.svg)](https://doi.org/10.5281/zenodo.18837162)
 
 ---
 
