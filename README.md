@@ -1,6 +1,6 @@
 # robust-rl-locomotion: Evaluation-Time Robustness of PPO under Observation and Dynamics Shift
 
-[![CI](https://github.com/imabhi80/robust-rl-locomotion/actions/workflows/ci.yml/badge.svg)](https://github.com/imabhi80/robust-rl-locomotion/actions/workflows/ci.yml)
+[![CI](https://github.com/jaintle/robust-rl-locomotion/actions/workflows/ci.yml/badge.svg)](https://github.com/imabhi80/robust-rl-locomotion/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.PLACEHOLDER.svg)](https://doi.org/10.5281/zenodo.PLACEHOLDER)
 
 ---
@@ -57,11 +57,11 @@ Results below are from the multi-seed experiment: seeds 0, 1, 2; 20 000 timestep
 
 Return vs severity (mass\_scale, 3 seeds, shaded ± std):
 
-![Return vs severity — mass_scale](results/agg_multiseed_exp/plots/return_vs_severity_mass_scale_multiseed.png)
+![Return vs severity — mass_scale](report/agg_multiseed_exp/plots/return_vs_severity_mass_scale_multiseed.png)
 
 Relative degradation vs severity (gaussian, 3 seeds, shaded ± std):
 
-![% drop vs severity — gaussian](results/agg_multiseed_exp/plots/drop_vs_severity_gaussian_multiseed.png)
+![% drop vs severity — gaussian](report/agg_multiseed_exp/plots/drop_vs_severity_gaussian_multiseed.png)
 
 ---
 
