@@ -13,7 +13,6 @@ dependencies = [
     "gymnasium>=1.0.0",
     "mujoco>=3.0.0",
     "numpy>=2.0.0",
-    "pandas>=2.0.0",
     "matplotlib>=3.0.0",
     "PyYAML>=6.0",
     "cloudpickle>=3.0.0",
@@ -25,5 +24,8 @@ dev = [
     "pytest-cov>=4.0.0",
 ]
 
-[tool.setuptools]
-packages = ["src", "src.algo", "src.envs", "src.envs.wrappers", "src.eval", "src.utils"]
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
